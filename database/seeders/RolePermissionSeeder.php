@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\User;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -12,21 +15,15 @@ class RolePermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles
-        $roles = ['teacher', 'student'];
-        foreach ($roles as $role) {
-            \Spatie\Permission\Models\Role::create(['name' => $role]);
-        }
 
         // Create permissions
         $permissions = ['view courses', 'create courses', 'edit courses', 'delete courses'];
         foreach ($permissions as $permission) {
-            \Spatie\Permission\Models\Permission::create(['name' => $permission]);
+            Permission::create(['name' => $permission]);
         }
 
-        // Assign permissions to roles
-        $teacherRole = \Spatie\Permission\Models\Role::findByName('teacher');
-        $studentRole = \Spatie\Permission\Models\Role::findByName('student');
+        $teacherRole = Role::create(['name' => 'teacher']);
+        $studentRole = Role::create(['name' => 'student']);
 
         //add permissions to admin and employee roles
         foreach ($permissions as $permission) {
@@ -37,7 +34,7 @@ class RolePermissionSeeder extends Seeder
         }
 
         //membuat data super admin
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
             'password' => bcrypt('superadmin'),

@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('student_answers', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('course_question_id');
             $table->string('answer');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('course_question_id')->constrained()->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

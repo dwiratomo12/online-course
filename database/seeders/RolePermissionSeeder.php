@@ -25,10 +25,10 @@ class RolePermissionSeeder extends Seeder
         $teacherRole = Role::create(['name' => 'teacher']);
         $studentRole = Role::create(['name' => 'student']);
 
-        //add permissions to admin and employee roles
+        //add permissions to teacher and student roles
         foreach ($permissions as $permission) {
             $teacherRole->givePermissionTo($permission);
-            if ($permission !== 'delete') {
+            if (!in_array($permission, ['delete courses', 'edit courses', 'create courses'])) { // klo buat di dalam array harus spesifik nama permissionnya
                 $studentRole->givePermissionTo($permission);
             }
         }

@@ -16,7 +16,10 @@ class CourseController extends Controller
      */
     public function index()
     {
-        return view('admin.courses.index');
+        $courses = Course::orderBy('id', 'desc')->get();
+        return view('admin.courses.index', [
+            'courses' => $courses
+        ]);
     }
 
     /**
@@ -35,7 +38,7 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $validated = $request->validate([
             'name'          => 'required|string|max:255',
             'category_id'   => 'required|integer',
             'cover'         => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -43,7 +46,7 @@ class CourseController extends Controller
 
         DB::beginTransaction();
         try {
-            if($request->hasFile('cover')) {
+            if ($request->hasFile('cover')) {
                 $coverPath = $request->file('cover')->store('product_covers', 'public');
                 $validated['cover'] = $coverPath;
             }
@@ -58,7 +61,7 @@ class CourseController extends Controller
             $error = ValidationException::withMessages([
                 'system_error' => ['System error!' . $e->getMessage()],
             ]);
-            
+
             throw $error;
         }
     }
@@ -68,7 +71,12 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        //
+        $students = $course->students()->orderBy('id', 'DESC')->get();
+
+        return view('admin.courses.manage', [
+            'course' => $course,
+            'students' => $students,
+        ]);
     }
 
     /**
@@ -76,7 +84,11 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
-        //
+        $categories = Category::all();
+        return view('admin.courses.edit', [
+            'course' => $course,
+            'categories'    => $categories
+        ]);
     }
 
     /**
@@ -84,7 +96,33 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        //
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'category_id'   => 'required|integer',
+            'cover'         => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            if ($request->hasFile('cover')) {
+                $coverPath = $request->file('cover')->store('product_covers', 'public');
+                $validated['cover'] = $coverPath;
+            }
+            $validated['slug'] = Str::slug($request->name);
+
+            $course->update($validated);
+
+            DB::commit();
+
+            return redirect()->route('dashboard.courses.index')->with('success', 'Course created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $error = ValidationException::withMessages([
+                'system_error' => ['System error!' . $e->getMessage()],
+            ]);
+
+            throw $error;
+        }
     }
 
     /**
@@ -92,6 +130,16 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        //
+        try {
+            $course->delete();
+            return redirect()->route('dashboard.courses.index')->with('success', 'Course deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $error = ValidationException::withMessages([
+                'system_error' => ['System error!' . $e->getMessage()],
+            ]);
+
+            throw $error;
+        }
     }
 }

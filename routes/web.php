@@ -29,12 +29,12 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:teacher');
 
         // untuk teacher menambahkan course
-        Route::get('/course/question/create/{course}', [CourseQuestionController::class], 'create')
+        Route::get('/course/question/create/{course}', [CourseQuestionController::class, 'create'])
         ->middleware('role:teacher')
         ->name('course.create.question'); 
 
         // untuk teacher menyimpan course
-        Route::post('/course/question/save/{course}', [CourseQuestionController::class], 'store')
+        Route::post('/course/question/save/{course}', [CourseQuestionController::class, 'store'])
         ->middleware('role:teacher')
         ->name('course.create.question.store'); 
 

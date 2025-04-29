@@ -20,7 +20,7 @@ class CourseQuestion extends Model
     }
 
     //untuk cek pertanyaan course ini jawabannya apa aja
-    public function answer(){
+    public function answers(){
         return $this->hasMany(CourseAnswer::class, 'course_question_id', 'id');
     }
 }

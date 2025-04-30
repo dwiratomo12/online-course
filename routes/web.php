@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
         ->name('course.course_students.index'); 
 
         // untuk membuat teacher supaya student bisa mengikuti course
-        Route::post('course/students/create/{course}', [CourseStudentController::class, 'create'])
+        Route::get('course/students/create/{course}', [CourseStudentController::class, 'create'])
         ->middleware('role:teacher')
         ->name('course.course_students.create'); 
 

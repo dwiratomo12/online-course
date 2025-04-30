@@ -140,6 +140,16 @@ class CourseQuestionController extends Controller
      */
     public function destroy(CourseQuestion $courseQuestion)
     {
-        //
+        try {
+            $courseQuestion->delete();
+            return redirect()->route('dashboard.courses.show', $courseQuestion->course_id);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $error = ValidationException::withMessages([
+                'system_error' => ['System error!' . $e->getMessage()],
+            ]);
+
+            throw $error;
+        }
     }
 }

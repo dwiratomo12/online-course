@@ -103,13 +103,16 @@
                         </a>
                     </li>
                     <li>
-                        <a href="signin.html"
-                            class="p-[10px_16px] flex items-center gap-[14px] rounded-full h-11 transition-all duration-300 hover:bg-[#2B82FE]">
-                            <div>
-                                <img src="{{asset('images/icons/security-safe.svg')}}" alt="icon">
-                            </div>
-                            <p class="font-semibold transition-all duration-300 hover:text-white">Logout</p>
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="w-full p-[10px_16px] flex items-center gap-[14px] rounded-full h-11 transition-all duration-300 hover:bg-[#2B82FE]">
+                                <div>
+                                    <img src="{{asset('images/icons/security-safe.svg')}}" alt="icon">
+                                </div>
+                                <p class="font-semibold transition-all duration-300 hover:text-white">Logout</p>
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
@@ -196,7 +199,15 @@
                     </div>
                 </div>
             </div>
-            <form id="add-student" class="mx-[70px] mt-[30px] flex flex-col gap-5">
+            @if($errors->any())
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li class="py-5 px-5 bg-red-500 text-dark">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <form action="{{ route('dashboard.course.course_students.store', $course) }}" id="add-student" class="mx-[70px] mt-[30px] flex flex-col gap-5" method="POST">
                 @csrf
                 <h2 class="font-bold text-2xl">Add New Student</h2>
                 <div class="flex flex-col gap-[10px]">
@@ -211,9 +222,9 @@
                             placeholder="Write student email address" name="email">
                     </div>
                 </div>
-                <a href="#"
+                <button href="#"
                     class="w-[500px] h-[52px] p-[14px_20px] bg-[#6436F1] rounded-full font-bold text-white transition-all duration-300 hover:shadow-[0_4px_15px_0_#6436F14D] text-center">Add
-                    Student</a>
+                    Student</button>
             </form>
         </div>
     </section>

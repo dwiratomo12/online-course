@@ -24,7 +24,7 @@ class LearningController extends Controller
             $asnweredQuestionCount = StudentAnswer::where('user_id', $user->id)
             ->whereHas('question', function ($query) use ($course) {
                 $query->where('course_id', $course->id);
-            })->distinct('')->count('course_question_id');
+            })->distinct()->count('course_question_id');
 
             // untuk mendapatkan pertanyaan yang belum dijawab
             if($asnweredQuestionCount < $totalQuestionCount){
@@ -67,7 +67,7 @@ class LearningController extends Controller
 
         return view('student.courses.learning', [
             'course' => $course,
-            'currentQuestion' => $currentQuestion,
+            'question' => $currentQuestion,
         ]);
     }
 }

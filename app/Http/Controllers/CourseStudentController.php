@@ -8,15 +8,42 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\StudentAnswer;
 
 class CourseStudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Course $course)
     {
-        //
+        $students = $course->students()->orderBy('id', 'DESC')->get();
+        $questions = $course->questions()->orderBy('id', 'DESC')->get();
+        $totalQuestions = $questions->count();
+
+        foreach ($students as $student) {
+            $studentAnswer = StudentAnswer::whereHas('question', function ($query) use ($course) {
+                $query->where('course_id', $course->id);
+            })->where('user_id', $student->id)->get();
+
+            $answerCount = $studentAnswer->count();
+            $correctAnswerCount = $studentAnswer->where('answer', 'correct')->count();
+
+            if ($answerCount == 0) {
+                $student->status = 'Not Started';
+            } elseif ($correctAnswerCount < $totalQuestions) {
+                $student->status = 'Not Passed';
+            } elseif ($correctAnswerCount == $totalQuestions) {
+                $student->status = 'Passed';
+            }
+        }
+
+
+        return view('admin.students.index', [
+            'course' => $course,
+            'questions' => $questions,
+            'students' => $students
+        ]);
     }
 
     /**
@@ -24,7 +51,7 @@ class CourseStudentController extends Controller
      */
     public function create(Course $course)
     {
-        $students = $course->students()->orderBy('id', 'asc')->get();
+        $students = $course->students()->orderBy('id', 'DESC')->get();
 
         return view('admin.students.add_student', [
             'course' => $course,
@@ -76,7 +103,6 @@ class CourseStudentController extends Controller
             ]);
             throw $error;
         }
-        
     }
 
     /**

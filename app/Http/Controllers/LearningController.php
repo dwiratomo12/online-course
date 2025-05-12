@@ -71,6 +71,25 @@ class LearningController extends Controller
         ]);
     }
 
+    public function learning_finished(Course $course)
+    {
+        $user = Auth::user();
+
+        //cek apakah course ini diambil oleh student
+        $isEnrolled = $user->courses()->where('user_id', $user->id)->exists();
+        if (!$isEnrolled) {
+            abort(404);
+        }
+
+        //cek sudah berapa banyak pertanyaan yang sudah dijawab, cari pertanyaan dulu baru kita tampilkan
+        $currentQuestion = CourseQuestion::where('course_id', $course->id)->firstOrFail();
+
+        return view('student.courses.learning_finished', [
+            'course' => $course,
+            'question' => $currentQuestion,
+        ]);
+    }
+
     public function learning_rapport(Course $course)
     {
         $userId = Auth::id();
